@@ -27,7 +27,7 @@ namespace Dbot
 
             _client.Log += Log;
 
-            string token = System.IO.File.ReadAllText(@"../../Key.pkey");
+            string token = System.IO.File.ReadAllText(@"key.pkey");
 
             _services = new ServiceCollection()
                 .AddSingleton(_client)
