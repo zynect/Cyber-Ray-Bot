@@ -26,9 +26,7 @@ namespace Dbot
             _commands = new CommandService();
 
             _client.Log += Log;
-
-            string token = System.IO.File.ReadAllText(@"key.pkey");
-
+            
             _services = new ServiceCollection()
                 .AddSingleton(_client)
                 .AddSingleton(_commands)
@@ -36,7 +34,7 @@ namespace Dbot
 
             await InstallCommandsAsync();
 
-            await _client.LoginAsync(TokenType.Bot, token);
+            await _client.LoginAsync(TokenType.Bot, Credentials.DiscordApiKey);
             await _client.StartAsync();
 
             // Block this task until the program is closed.
@@ -64,6 +62,11 @@ namespace Dbot
                 return;
             // Create a Command Context
             var context = new SocketCommandContext(_client, message);
+            if (message.Author.Id == _client.CurrentUser.Id)
+            {
+                await context.Channel.SendMessageAsync("Hah, nice try.");
+                return;
+            }
             // Execute the command. (result does not indicate a return value, 
             // rather an object stating if the command executed successfully)
             var result = await _commands.ExecuteAsync(context, argPos, _services);
