@@ -21,6 +21,42 @@ namespace Dbot
             // ReplyAsync is a method on ModuleBase
             await ReplyAsync(echo);
         }
+        [Command("stats")]
+        [Summary("Prints out URL for op.gg")]
+        public async Task SayStats([Remainder][Summary("Stats to display")] string text)
+        {
+            String[] textArray = text.Split(' ');
+            string region = textArray[0];
+            string userName = textArray[1];
+            try
+            {
+                StringBuilder sb = new StringBuilder();
+                sb.Append("http://");
+                if (!region.Equals("kr"))
+                {
+                    sb.Append(region + ".");
+                }
+                else
+                {
+                    sb.Append("www.");
+                }
+                sb.Append("op.gg/summoner/userName=" + userName);
+                for (int i = 2; i < textArray.Length; i++)
+                {
+                    sb.Append("+" + textArray[i]);
+                }
+                await ReplyAsync(sb.ToString());
+            }
+            catch (Exception)
+            {
+                await ReplyAsync("Username not found");
+            }
+
+
+
+
+
+        }
     }
 
     // Create a module with the 'yt' prefix
