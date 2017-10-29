@@ -21,6 +21,14 @@ namespace Dbot
             // ReplyAsync is a method on ModuleBase
             await ReplyAsync(echo);
         }
+
+        [Command("help")]
+        [Summary("Links to the website.")]
+        public async Task Help()
+        {
+            await ReplyAsync("https://s3.us-east-2.amazonaws.com/cyberray/index.html");
+        }
+
         [Command("opgg")]
         [Summary("Prints out URL for op.gg")]
         public async Task SayStats([Remainder][Summary("Stats to display")] string text)
