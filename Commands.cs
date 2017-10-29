@@ -51,11 +51,114 @@ namespace Dbot
             {
                 await ReplyAsync("Username not found");
             }
+        }
 
+        [Command("8ball")]
+        [Summary("Gives an 8ball-like response to a query.")]
+        public async Task EightBall([Remainder][Summary("The question")] string query = null)
+        {
+            Random rand = new Random();
+            string str;
+            if (String.IsNullOrEmpty(query))
+            {
+                str = "Uh, were you trying to ask me something?";
+            }
+            else
+            {
+                string[] strings = {"Maybe so.",
+                                "Who knows? I sure as hell don't.",
+                                "Yeah, sure, whatever.",
+                                "It's a sure thing.",
+                                "Sometime in the distant future, there's a shadow of a chance...",
+                                "Try again later.",
+                                "Try again never.",
+                                "Gross, why would you ask that?",
+                                "No, you dumb shit.",
+                                "Hell yeah!",
+                                "Maybe, if you're drunk enough.",
+                                "Hmm... Maybe with a little luck.",
+                                "I'll tell you, after my nap.",
+                                "You couldn't pay me to tell you.",
+                                "-_-",
+                                "JESUS CHRIST NO",
+                                "Why not?",
+                                "One million percent yes.",
+                                "I've never been more sure of anything in my short, robotic life.",
+                                "I wish I could rewind time and stop you from asking me that."};
+                str = strings[rand.Next(0, strings.Length - 1)];
+            }
 
+            await ReplyAsync(Context.User.Mention + ' ' + str);
+        }
 
+        [Command("prefix")]
+        [Summary("Changes the prefix that summons the bot.")]
+        public async Task Prefix([Summary("The prefix")] char prefix)
+        {
+            if ((Context.User as SocketGuildUser).GuildPermissions.Administrator)
+            {
+                var user = Context.Guild.GetUser(Context.Client.CurrentUser.Id);
+                await user.ModifyAsync(x => {
+                    x.Nickname = $"{prefix}Cyber Ray";
+                });
+                await ReplyAsync($"Changed command prefix to {prefix}.");
+            }
+            else
+            {
+                AdminRestrictedCommand();
+            }
+        }
 
+        [Command("teams")]
+        [Summary("Makes two teams out of a voice channel.")]
+        public async Task Teams([Summary("The number of teams")] int teams)
+        {
+            var users = (Context.User as SocketGuildUser).VoiceChannel.Users;
 
+            if (users.Count < teams)
+            {
+                await ReplyAsync($"You can't make {teams} teams out of {users.Count} users.");
+                return;
+            }
+            else if (teams < 2)
+            {
+                await ReplyAsync($"...You kidding me right now? I can't make {teams} team" + ((teams == 1) ? "." : "s."));
+                return;
+            }
+
+            List<ulong>[] teamLists = new List<ulong>[teams];
+
+            for(int i = 0; i < teams; i++)
+            {
+                teamLists[i] = new List<ulong>();
+            }
+
+            Random r = new Random();
+            int currentTeam = 0;
+
+            foreach (int i in Enumerable.Range(0, users.Count).OrderBy(x => r.Next()))
+            {
+                teamLists[currentTeam++].Add(users.ElementAt(i).Id);
+                currentTeam %= teams;
+            }
+
+            string funnyString = "maggots";
+
+            await ReplyAsync($"All right, {funnyString}. Let's play a game together.");
+            for (int i = 0; i < teams; i++)
+            {
+                string teamString = $"Team {i + 1}! Here are your teammates:\n";
+                foreach (ulong ID in teamLists[i])
+                {
+                    teamString += Context.Guild.GetUser(ID).Mention + '\n';
+                }
+                await ReplyAsync(teamString);
+            }
+        }
+
+        public async void AdminRestrictedCommand()
+        {
+            await ReplyAsync($"Don't you start with me, {Context.User.Mention}.");
         }
     }
 

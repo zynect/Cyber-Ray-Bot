@@ -26,6 +26,7 @@ namespace Dbot
             _commands = new CommandService();
 
             _client.Log += Log;
+            _client.JoinedGuild += JoinedGuild;
             
             _services = new ServiceCollection()
                 .AddSingleton(_client)
@@ -58,7 +59,7 @@ namespace Dbot
             // Create a number to track where the prefix ends and the command begins
             int argPos = 0;
             // Determine if the message is a command, based on if it starts with '!' or a mention prefix
-            if (!(message.HasCharPrefix('!', ref argPos) || message.HasMentionPrefix(_client.CurrentUser, ref argPos)))
+            if (!(message.HasCharPrefix((message.Author as SocketGuildUser).Guild.GetUser(_client.CurrentUser.Id).Nickname[0], ref argPos) || message.HasMentionPrefix(_client.CurrentUser, ref argPos)))
                 return;
             // Create a Command Context
             var context = new SocketCommandContext(_client, message);
@@ -77,6 +78,16 @@ namespace Dbot
         private Task Log(LogMessage msg)
         {
             Console.WriteLine(msg.ToString());
+            return Task.CompletedTask;
+        }
+
+        private Task JoinedGuild(SocketGuild guild)
+        {
+            var user = guild.GetUser(_client.CurrentUser.Id);
+            user.ModifyAsync(x => {
+                x.Nickname = "!Cyber Ray";
+            });
+
             return Task.CompletedTask;
         }
     }
