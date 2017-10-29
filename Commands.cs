@@ -17,7 +17,7 @@ namespace Dbot
             // ReplyAsync is a method on ModuleBase
             await ReplyAsync(echo);
         }
-        [Command("stats")]
+        [Command("opgg")]
         [Summary("Prints out URL for op.gg")]
         public async Task SayStats([Remainder][Summary("Stats to display")] string text)
         {
