@@ -92,6 +92,88 @@ namespace Dbot
             await ReplyAsync(Context.User.Mention + ' ' + str);
         }
 
+        [Command("google")]
+        [Summary("Googles something for you")]
+        public async Task Google([Remainder][Summary("The question")] string query = null)
+        {
+            string str;
+            String[] textArray = query.Split(' ');
+            if (String.IsNullOrEmpty(query))
+            {
+                str = "Uh, were you trying to ask me something?";
+            }
+            else
+            {
+                query = query.Replace(' ', '+');
+                str = "http://lmgtfy.com/?q=" + query;
+            }
+
+            await ReplyAsync(str);
+        }
+
+        [Command("bing")]
+        [Summary("Bings something for you")]
+        public async Task Bing([Remainder][Summary("The question")] string query = null)
+        {
+            string str;
+            String[] textArray = query.Split(' ');
+            if (String.IsNullOrEmpty(query))
+            {
+                str = "Uh, were you trying to ask me something?";
+            }
+            else
+            {
+                query = query.Replace(' ', '+');
+                str = "http://lmgtfy.com/?s=b&q=" + query;
+            }
+
+            await ReplyAsync(str);
+        }
+
+        [Command("emotion")]
+        [Summary("Gives a random emotion.")]
+        public async Task Emotion([Remainder][Summary("The request")] string query = null)
+        {
+            Random rand = new Random();
+            string target;
+            string str;
+            string[] emotions = {"angry.",
+                            "sad...",
+                            "happy!",
+                            "disappointed.",
+                            "furious!",
+                            "ambivalent.",
+                            "disinterested.",
+                            "excited!",
+                            "exhausted...",
+                            "nervous.",
+                            "tired.",
+                            "disgusted. *Ugh*",
+                            "surprised!",
+                            "embarrassed...",
+                            "scared.",
+                            "terrified!",
+                            "angsty!",
+                            "like shit...",
+                            "exuberant!",
+                            "vindicated.",
+                            "powerful!",
+                            "curmudgeonly.",
+                            "dead inside.",
+                            "great!",
+                            "nothing.",
+                            "***horny***.",
+                            "hyper!"};
+            if (String.IsNullOrEmpty(query))
+                target = "I feel ";
+            else
+                target = "They feel ";
+
+            str = target + emotions[rand.Next(0, emotions.Length)];
+
+            await ReplyAsync(str);
+        }
+
         [Command("prefix")]
         [Summary("Changes the prefix that summons the bot.")]
         public async Task Prefix([Summary("The prefix")] char prefix)
