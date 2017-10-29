@@ -27,11 +27,10 @@ namespace Dbot
     [Group("yt")]
     public class YouTube : ModuleBase<SocketCommandContext>
     {
-        // ~sample square 20 -> 400
-        [Command("vid")]
-        [Summary("Searches for a video.")]
-        [Alias("video", "search")]
-        public async Task SquareAsync([Remainder] [Summary("The video to search for.")] string video)
+        [Command("search")]
+        [Summary("Searches on YouTube.")]
+        [Alias("s")]
+        public async Task SearchAsync([Remainder] [Summary("The string to search for.")] string str)
         {
             var youtubeService = new YouTubeService(new BaseClientService.Initializer()
             {
@@ -39,22 +38,117 @@ namespace Dbot
                 ApplicationName = this.GetType().ToString()
             });
 
-            await ReplyAsync("https://youtube.com/watch?v=" + video);
+            var searchListRequest = youtubeService.Search.List("snippet,id");
+            searchListRequest.Q = str;
+            searchListRequest.MaxResults = 1;
+
+            var searchListResponse = await searchListRequest.ExecuteAsync();
+            if (searchListResponse.Items.Count < 1)
+            {
+                await ReplyAsync("No results were returned for this query.");
+                return;
+            }
+
+            var searchResult = searchListResponse.Items[0];
+
+            switch (searchResult.Id.Kind)
+            {
+                case "youtube#video":
+                    await ReplyAsync("Video: "+ searchResult.Snippet.Title + "\nURL: https://youtube.com/watch?v=" + searchResult.Id.VideoId);
+                    break;
+
+                case "youtube#channel":
+                    await ReplyAsync("Channel: " + searchResult.Snippet.Title + "\nURL: https://youtube.com/channel/" + searchResult.Id.ChannelId);
+                    break;
+
+                case "youtube#playlist":
+                    await ReplyAsync("Playlist: " + searchResult.Snippet.Title + "\nURL: https://youtube.com/playlist?list=" + searchResult.Id.PlaylistId);
+                    break;
+            };
         }
 
-        // ~sample userinfo --> foxbot#0282
-        // ~sample userinfo @Khionu --> Khionu#8708
-        // ~sample userinfo Khionu#8708 --> Khionu#8708
-        // ~sample userinfo Khionu --> Khionu#8708
-        // ~sample userinfo 96642168176807936 --> Khionu#8708
-        // ~sample whois 96642168176807936 --> Khionu#8708
-        [Command("userinfo")]
-        [Summary("Returns info about the current user, or the user parameter, if one passed.")]
-        [Alias("user", "whois")]
-        public async Task UserInfoAsync([Summary("The (optional) user to get info for")] SocketUser user = null)
+        [Command("video")]
+        [Summary("Searches for videos on YouTube.")]
+        [Alias("vid", "v")]
+        public async Task VideoAsync([Remainder] [Summary("The video to search for.")] string video)
         {
-            var userInfo = user ?? Context.Client.CurrentUser;
-            await ReplyAsync($"{userInfo.Username}#{userInfo.Discriminator}");
+            var youtubeService = new YouTubeService(new BaseClientService.Initializer()
+            {
+                ApiKey = Credentials.YouTubeApiKey,
+                ApplicationName = this.GetType().ToString()
+            });
+
+            var searchListRequest = youtubeService.Search.List("snippet,id");
+            searchListRequest.Q = video;
+            searchListRequest.MaxResults = 1;
+            searchListRequest.Type = "video";
+
+            var searchListResponse = await searchListRequest.ExecuteAsync();
+            if (searchListResponse.Items.Count < 1)
+            {
+                await ReplyAsync("No results were returned for this query.");
+                return;
+            }
+
+            var searchResult = searchListResponse.Items[0];
+            
+            await ReplyAsync("Video: " + searchResult.Snippet.Title + "\nURL: https://youtube.com/watch?v=" + searchResult.Id.VideoId);
+        }
+
+        [Command("channel")]
+        [Summary("Searches for channels on YouTube.")]
+        [Alias("chan", "c")]
+        public async Task ChannelAsync([Remainder] [Summary("The channel to search for.")] string channel)
+        {
+            var youtubeService = new YouTubeService(new BaseClientService.Initializer()
+            {
+                ApiKey = Credentials.YouTubeApiKey,
+                ApplicationName = this.GetType().ToString()
+            });
+
+            var searchListRequest = youtubeService.Search.List("snippet,id");
+            searchListRequest.Q = channel;
+            searchListRequest.MaxResults = 1;
+            searchListRequest.Type = "channel";
+
+            var searchListResponse = await searchListRequest.ExecuteAsync();
+            if (searchListResponse.Items.Count < 1)
+            {
+                await ReplyAsync("No results were returned for this query.");
+                return;
+            }
+
+            var searchResult = searchListResponse.Items[0];
+
+            await ReplyAsync("Channel: " + searchResult.Snippet.Title + "\nURL: https://youtube.com/channel/" + searchResult.Id.ChannelId);
+        }
+
+        [Command("playlist")]
+        [Summary("Searches for videos on YouTube.")]
+        [Alias("list", "p")]
+        public async Task PlaylistAsync([Remainder] [Summary("The playlist to search for.")] string playlist)
+        {
+            var youtubeService = new YouTubeService(new BaseClientService.Initializer()
+            {
+                ApiKey = Credentials.YouTubeApiKey,
+                ApplicationName = this.GetType().ToString()
+            });
+
+            var searchListRequest = youtubeService.Search.List("snippet,id");
+            searchListRequest.Q = playlist;
+            searchListRequest.MaxResults = 1;
+            searchListRequest.Type = "playlist";
+
+            var searchListResponse = await searchListRequest.ExecuteAsync();
+            if (searchListResponse.Items.Count < 1)
+            {
+                await ReplyAsync("No results were returned for this query.");
+                return;
+            }
+
+            var searchResult = searchListResponse.Items[0];
+
+            await ReplyAsync("Playlist: " + searchResult.Snippet.Title + "\nURL: https://youtube.com/playlist?list=" + searchResult.Id.PlaylistId);
         }
     }
 }
