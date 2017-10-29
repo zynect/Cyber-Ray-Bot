@@ -68,11 +68,11 @@ namespace Dbot
                 string[] strings = {"Maybe so.",
                                 "Who knows? I sure as hell don't.",
                                 "Yeah, sure, whatever.",
-                                "It's a sure thing.",
-                                "Sometime in the distant future, there's a shadow of a chance...",
+                                "Fo' sho', bro.",
+                                "Sometime in the distant future",
                                 "Try again later.",
                                 "Try again never.",
-                                "Gross, why would you ask that?",
+                                "Now why would you ask that?",
                                 "No, you dumb shit.",
                                 "Hell yeah!",
                                 "Maybe, if you're drunk enough.",
@@ -84,8 +84,9 @@ namespace Dbot
                                 "Why not?",
                                 "One million percent yes.",
                                 "I've never been more sure of anything in my short, robotic life.",
-                                "I wish I could rewind time and stop you from asking me that."};
-                str = strings[rand.Next(0, strings.Length - 1)];
+                                "I wish I could rewind time and stop you from asking me that.",
+                                "Lemme sleep on it."};
+                str = strings[rand.Next(0, strings.Length)];
             }
 
             await ReplyAsync(Context.User.Mention + ' ' + str);
@@ -113,16 +114,29 @@ namespace Dbot
         [Summary("Makes two teams out of a voice channel.")]
         public async Task Teams([Summary("The number of teams")] int teams)
         {
+            if ((Context.User as SocketGuildUser).VoiceChannel == null)
+            {
+                await ReplyAsync($"Now who in the hell do you expect me to team you up with, {Context.User.Mention}? Get in a voice chat first!");
+                return;
+            }
+
             var users = (Context.User as SocketGuildUser).VoiceChannel.Users;
 
             if (users.Count < teams)
             {
-                await ReplyAsync($"You can't make {teams} teams out of {users.Count} users.");
+                if (users.Count == 1)
+                {
+                    await ReplyAsync($"Any particular reason you want to split yourself in {teams}, {Context.User.Mention}? Sounds mighty painful.");
+                }
+                else
+                {
+                    await ReplyAsync($"You can't make {teams} teams out of {users.Count} users.");
+                }
                 return;
             }
             else if (teams < 2)
             {
-                await ReplyAsync($"...You kidding me right now? I can't make {teams} team" + ((teams == 1) ? "." : "s."));
+                await ReplyAsync($"...You kidding me right now, {Context.User.Mention}? " + ((teams == 1) ? "There's no point in making only one team." : $"I can't exactly make {teams} teams."));
                 return;
             }
 
@@ -142,9 +156,17 @@ namespace Dbot
                 currentTeam %= teams;
             }
 
-            string funnyString = "maggots";
+            string[] nameCalling = {"maggots",
+                                    "babies",
+                                    "yankees",
+                                    "losers",
+                                    "shut up, all of ya'",
+                                    "dumbfucks",
+                                    "shitstains",
+                                    "you beautiful people"};
+            string funnyString = nameCalling[r.Next(0, nameCalling.Length)];
 
-            await ReplyAsync($"All right, {funnyString}. Let's play a game together.");
+            await ReplyAsync($"All right, {funnyString}! Let's play a game together.");
             for (int i = 0; i < teams; i++)
             {
                 string teamString = $"Team {i + 1}! Here are your teammates:\n";
