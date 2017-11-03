@@ -186,8 +186,13 @@ namespace Dbot
         [Summary("Changes the prefix that summons the bot.")]
         public async Task Prefix([Summary("The prefix")] char prefix)
         {
-            if ((Context.User as SocketGuildUser).GuildPermissions.Administrator)
+            if ((Context.User as SocketGuildUser).GuildPermissions.ManageNicknames)
             {
+                if(prefix == '#' || prefix == '@' || prefix == '<')
+                {
+                    await ReplyAsync($"I ain't changing my prefix to *that*.");
+                    return;
+                }
                 var user = Context.Guild.GetUser(Context.Client.CurrentUser.Id);
                 await user.ModifyAsync(x => {
                     x.Nickname = $"{prefix}Cyber Ray";

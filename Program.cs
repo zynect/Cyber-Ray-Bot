@@ -66,11 +66,13 @@ namespace Dbot
 
             if (!(message.HasCharPrefix(prefix, ref argPos) || message.HasMentionPrefix(_client.CurrentUser, ref argPos)))
                 return;
+           
             // Create a Command Context
             var context = new SocketCommandContext(_client, message);
+            
             if (message.Author.Id == _client.CurrentUser.Id)
             {
-                await context.Channel.SendMessageAsync("Hah, nice try.");
+                //await context.Channel.SendMessageAsync("Hah, nice try.");
                 return;
             }
             // Execute the command. (result does not indicate a return value, 
