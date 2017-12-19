@@ -105,7 +105,6 @@ namespace Dbot
         public async Task Google([Remainder][Summary("The question")] string query = null)
         {
             string str;
-            String[] textArray = query.Split(' ');
             if (String.IsNullOrEmpty(query))
             {
                 str = "Uh, were you trying to ask me something?";
@@ -124,7 +123,6 @@ namespace Dbot
         public async Task Bing([Remainder][Summary("The question")] string query = null)
         {
             string str;
-            String[] textArray = query.Split(' ');
             if (String.IsNullOrEmpty(query))
             {
                 str = "Uh, were you trying to ask me something?";
@@ -133,6 +131,46 @@ namespace Dbot
             {
                 query = query.Replace(' ', '+');
                 str = "http://lmgtfy.com/?s=b&q=" + query;
+            }
+
+            await ReplyAsync(str);
+        }
+
+        [Command("mention")]
+        [Summary("mentions a channel")]
+        public async Task Mention([Remainder][Summary("The channel")] string query = null)
+        {
+            string str = "";
+            if (String.IsNullOrEmpty(query))
+            {
+                str = "Uh, were you trying to ask me something?";
+            }
+            else
+            {
+                var channels = Context.Guild.VoiceChannels;
+                foreach (var chnl in channels)
+                {
+                    if (chnl.Name.Equals(query))
+                    {
+                        if (chnl.Users.Count > 0)
+                        {
+                            foreach (var person in chnl.Users)
+                            {
+                                str += Context.Guild.GetUser(person.Id).Mention + " ";
+                            }
+                        }
+                        else
+                        {
+                            str = "There's no one in the channel.";
+                        }
+                        break;
+                    }
+                }
+            }
+
+            if (String.IsNullOrEmpty(str))
+            {
+                str = "I can't find the channel you wanted, keep in mind the search is case sensitive.";
             }
 
             await ReplyAsync(str);
